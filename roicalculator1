@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reporting ROI Calculator</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f7fa;
+      color: #1f2933;
+    }
+
+    .roi-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 24px 24px 28px;
+      box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+      border: 1px solid #e5e7eb;
+    }
+
+    .roi-header {
+      margin-bottom: 20px;
+    }
+
+    .roi-title {
+      font-size: 1.6rem;
+      margin: 0 0 4px;
+      color: #111827;
+    }
+
+    .roi-subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #4b5563;
+    }
+
+    .roi-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 2.5fr);
+      gap: 24px;
+      margin-top: 20px;
+      align-items: flex-start;
+    }
+
+    .roi-inputs, .roi-results {
+      border-radius: 8px;
+      padding: 16px 18px 18px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+
+    .roi-section-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #111827;
+    }
+
+    .roi-field {
+      margin-bottom: 12px;
+    }
+
+    .roi-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+    }
+
+    .roi-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .roi-hint {
+      font-size: 0.78rem;
+      color: #6b7280;
+    }
+
+    .roi-input {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 5px;
+      border: 1px solid #d1d5db;
+      font-size: 0.9rem;
+      box-sizing: border-box;
+    }
+
+    .roi-input:focus {
+      outline: none;
+      border-color: #ff9f1c;
+      box-shadow: 0 0 0 1px rgba(255, 159, 28, 0.25);
+    }
+
+    .roi-fixed-note {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: #6b7280;
+      padding: 6px 8px;
+      border-radius: 6px;
+      background: #fff7ed;
+      border: 1px dashed #fed7aa;
+    }
+
+    .roi-results-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .roi-result-card {
+      background: #ffffff;
+      border-radius: 7px;
+      padding: 8px 9px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .roi-result-label {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-bottom: 4px;
+    }
+
+    .roi-result-value {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .roi-highlight {
+      border-color: #ff9f1c;
+      background: #fffbeb;
+    }
+
+    .roi-highlight .roi-result-value {
+      color: #b45309;
+    }
+
+    .roi-summary {
+      margin-top: 18px;
+      padding: 10px 11px;
+      border-radius: 7px;
+      background: #d90852;
+      border: 1px solid #bbf7d0;
+      font-size: 0.9rem;
+      color: #ffffff;
+    }
+
+    .roi-summary strong {
+      font-weight: 700;
+    }
+
+    .roi-footer-note {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    @media (max-width: 720px) {
+      .roi-wrapper {
+        padding: 16px 14px 20px;
+      }
+
+      .roi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="roi-wrapper" id="pi-roi-calculator">
+  <div class="roi-header">
+    <h2 class="roi-title">Reporting ROI Calculator</h2>
+    <p class="roi-subtitle">
+      Estimate how much you can save each year by automating reporting with Panintelligence.
+    </p>
+  </div>
+
+  <div class="roi-grid">
+    <!-- Inputs -->
+    <div class="roi-inputs">
+      <div class="roi-section-title">Your current reporting workload</div>
+
+      <div class="roi-field">
+        <div class="roi-label-row">
+          <label class="roi-label" for="reportsPerMonth">Reports per month</label>
+          <span class="roi-hint">Typical team: 40 reports</span>
+        </div>
+        <input
+          id="reportsPerMonth"
+          class="roi-input"
+          type="number"
+          min="1"
+          value="40"
+        >
+      </div>
+
+      <div class="roi-field">
+        <div class="roi-label-row">
+          <label class="roi-label" for="hoursPerReportManual">Hours per report (manual)</label>
+          <span class="roi-hint">Manual creation, formatting & sending</span>
+        </div>
+        <input
+          id="hoursPerReportManual"
+          class="roi-input"
+          type="number"
+          min="0"
+          step="0.25"
+          value="2"
+        >
+      </div>
+
+      <!-- Fixed 15 minutes review time -->
+      <div class="roi-field">
+        <div class="roi-label-row">
+          <label class="roi-label">Minutes to review each report with Panintelligence before sending</label>
+        </div>
+        <input
+          class="roi-input"
+          type="text"
+          value="Only 15 minutes"
+          disabled
+        >
+        <div class="roi-fixed-note">
+          Review time is fixed at 15 minutes per report (0.25 hours) for this calculator.
+        </div>
+      </div>
+
+      <!-- Fixed £35/hour staff cost -->
+      <div class="roi-field">
+        <div class="roi-label-row">
+          <span class="roi-label">Staff cost per hour</span>
+        </div>
+        <input
+          class="roi-input"
+          type="text"
+          value="£35 per hour (fixed)"
+          disabled
+        >
+        <div class="roi-fixed-note">
+          For this calculator, staff cost is fixed at £35 per hour to keep comparisons consistent.
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="roi-results">
+      <div class="roi-section-title">Annual cost & savings</div>
+
+      <div class="roi-results-grid">
+        <div class="roi-result-card">
+          <div class="roi-result-label">Manual reporting cost (per year)</div>
+          <div class="roi-result-value" id="manualAnnualCost">£33,600</div>
+        </div>
+
+        <div class="roi-result-card">
+          <div class="roi-result-label">Automated reporting cost (per year)</div>
+          <div class="roi-result-value" id="automatedAnnualCost">£4,200</div>
+        </div>
+
+        <div class="roi-result-card roi-highlight">
+          <div class="roi-result-label">Annual saving</div>
+          <div class="roi-result-value" id="annualSaving">£29,400</div>
+        </div>
+
+        <div class="roi-result-card">
+          <div class="roi-result-label">Cost reduction</div>
+          <div class="roi-result-value" id="costReductionPercent">87.5%</div>
+        </div>
+      </div>
+
+      <div class="roi-summary" id="roiSummary">
+        With your current inputs, automating reporting with Panintelligence could save you <strong>£29,400 per year</strong>.
+      </div>
+
+      <div class="roi-footer-note">
+        Calculations based on: annual cost = reports per month × hours per report × 12 × £35.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const STAFF_COST = 35; // £35 per hour fixed
+    const FIXED_AUTOMATED_HOURS = 0.25; // 15 minutes per report
+
+    const reportsPerMonthEl = document.getElementById("reportsPerMonth");
+    const hoursPerReportManualEl = document.getElementById("hoursPerReportManual");
+
+    const manualAnnualCostEl = document.getElementById("manualAnnualCost");
+    const automatedAnnualCostEl = document.getElementById("automatedAnnualCost");
+    const annualSavingEl = document.getElementById("annualSaving");
+    const costReductionPercentEl = document.getElementById("costReductionPercent");
+    const roiSummaryEl = document.getElementById("roiSummary");
+
+    function formatCurrency(value) {
+      if (!isFinite(value)) return "£0";
+      return "£" + value.toLocaleString("en-GB", {
+        maximumFractionDigits: 0
+      });
+    }
+
+    function formatPercent(value) {
+      if (!isFinite(value)) return "0%";
+      return value.toLocaleString("en-GB", {
+        maximumFractionDigits: 1
+      }) + "%";
+    }
+
+    function calculate() {
+      const reportsPerMonth = parseFloat(reportsPerMonthEl.value) || 0;
+      const hoursPerReportManual = parseFloat(hoursPerReportManualEl.value) || 0;
+      const hoursPerReportAutomated = FIXED_AUTOMATED_HOURS; // always 0.25 hours
+
+      const manualAnnualHours = reportsPerMonth * hoursPerReportManual * 12;
+      const automatedAnnualHours = reportsPerMonth * hoursPerReportAutomated * 12;
+
+      const manualAnnualCost = manualAnnualHours * STAFF_COST;
+      const automatedAnnualCost = automatedAnnualHours * STAFF_COST;
+      const annualSaving = manualAnnualCost - automatedAnnualCost;
+      const reductionPercent = manualAnnualCost > 0
+        ? (annualSaving / manualAnnualCost) * 100
+        : 0;
+
+      manualAnnualCostEl.textContent = formatCurrency(manualAnnualCost);
+      automatedAnnualCostEl.textContent = formatCurrency(automatedAnnualCost);
+      annualSavingEl.textContent = formatCurrency(annualSaving);
+      costReductionPercentEl.textContent = formatPercent(reductionPercent);
+
+      roiSummaryEl.innerHTML =
+        "With your current inputs, automating reporting with Panintelligence could save you " +
+        "<strong>" + formatCurrency(annualSaving) + " per year</strong>.";
+    }
+
+    reportsPerMonthEl.addEventListener("input", calculate);
+    hoursPerReportManualEl.addEventListener("input", calculate);
+
+    // Initial calculation with defaults
+    calculate();
+  })();
+</script>
+</body>
+</html>
